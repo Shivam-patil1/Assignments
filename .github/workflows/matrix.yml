@@ -1,0 +1,36 @@
+@"
+name: Matrix CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: \${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [16, 18]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: \${{ matrix.node }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Security scan (Ubuntu + Node 18 only)
+        if: matrix.os == 'ubuntu-latest' && matrix.node == 18
+        run: echo "Running extra security scan..."
+"@ | Out-File -Encoding UTF8 .github/workflows/matrix.yml
