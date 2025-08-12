@@ -1,0 +1,38 @@
+name: Environment Based Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Staging
+        run: echo "🚀 Deploying to staging..."
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Production
+        run: echo "🚀 Deploying to production..."
