@@ -1,0 +1,36 @@
+name: Test Workflow
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: 'Node.js version to use'
+        required: true
+        type: string
+      run_lint:
+        description: 'Whether to run linting'
+        required: true
+        type: boolean
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run lint
+        if: ${{ inputs.run_lint }}
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+cc
